@@ -1,0 +1,80 @@
+<link rel="stylesheet" href="css/diasTipo.css">
+<div ng-controller="diaDePagoController" ng-init="initDia()" >
+    <div class="row">
+        <h4 class="space-bottom">Días de Pago por empresa</h4>
+         <br>
+    <br>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label>Empresa</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" ng-model='empresa.emp_nombre' aria-label="...">
+                    <div class="input-group-btn">
+                        <button id="btnTotalxEmpres" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  autocomplete="off">Seleccione <span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li ng-repeat="empresa in empresas">
+                                <a href="#" ng-click="empresaSeleccion(empresa)">{{empresa.emp_nombre}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="form-group">
+                <label for="exampleInputEmail2">Día de pago a proveedores de crédito</label>
+            </div>
+        </div>
+        <br>
+        <section id="container">
+            <div class="row radio-input">
+                <div class="col-sm-12">
+                    <label class="containerRadio" ng-click="diaPago = 1">Lunes
+                        <input type="radio" name="radio" value="1" ng-model="diaPago">
+                        <span class="checkmarkRadio"></span>
+                    </label>
+                    <label class="containerRadio" ng-click="diaPago = 2">Martes
+                        <input type="radio" name="radio" value="2" ng-model="diaPago">
+                        <span class="checkmarkRadio"></span>
+                    </label>
+                    <label class="containerRadio" ng-click="diaPago = 3">Miércoles
+                        <input type="radio" name="radio" value="3" ng-model="diaPago">
+                        <span class="checkmarkRadio"></span>
+                    </label>
+                     <label class="containerRadio" ng-click="diaPago = 4">Jueves
+                        <input type="radio" name="radio" value="4" ng-model="diaPago">
+                        <span class="checkmarkRadio"></span>
+                    </label>
+                     <label class="containerRadio" ng-click="diaPago = 5">Viernes
+                        <input type="radio" name="radio" value="5" ng-model="diaPago">
+                        <span class="checkmarkRadio"></span>
+                    </label>
+                     <label class="containerRadio" ng-click="diaPago = 6">Sábado
+                        <input type="radio" name="radio" value="6" ng-model="diaPago">
+                        <span class="checkmarkRadio"></span>
+                    </label>
+                </div>
+            </div>
+        <section/>
+   </div>
+    <br>
+    <br>
+    <br>
+    <div class="row" ng-show="verBtn">
+        <div class="col-sm-8">
+            <div class="form-group">
+              <button id="guardaDia" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="guardaDia()" data-loading-text="Guardando..." style="width: 100px" ng->Guardar</button>
+            </div>
+        </div> 
+    </div> 
+    <br>
+    <br>
+    <br>
+    <br>
+</div>

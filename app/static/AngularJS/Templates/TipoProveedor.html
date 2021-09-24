@@ -1,0 +1,104 @@
+<link rel="stylesheet" href="css/loading.css">
+<div ng-controller="tipoProveedorController"  ng-init="initTipo()">
+    <div class="row">
+        <h4 class="space-bottom">Tipos de Proveedores</h4>
+         <br>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label for="exampleInputEmail2">Asignación de Tipo de Proveedor</label>
+            </div>
+        </div>
+        <br>
+
+         <div class="col-sm-12">
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label>Empresa</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" ng-model='empresa.emp_nombre' aria-label="...">
+                    <div class="input-group-btn">
+                        <button id="btnTotalxEmpres" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"  autocomplete="off">Seleccione <span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li ng-repeat="empresa in empresas">
+                                <a href="#" ng-click="empresaSeleccion(empresa)">{{empresa.emp_nombre}}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+          <br>
+        <br>
+        <br>
+          <br>
+        <br>
+        <br>
+        </div>
+
+        <section id="container">
+            <div class="row radio-input">
+                <div class="col-sm-8" style="float: right;">
+                    <label class="containerRadio" ng-click="tipo = 1">Planta / Financiera
+                        <input type="radio" name="radio" value="1" ng-model="tipo">
+                        <span class="checkmarkRadio"></span>
+                    </label>
+                    <label class="containerRadio" ng-click="tipo = 2">Crédito
+                        <input type="radio" name="radio" value="2" ng-model="tipo">
+                        <span class="checkmarkRadio"></span>
+                    </label>
+                    <label class="containerRadio" ng-click="tipo = 3">Operación
+                        <input type="radio" name="radio" value="3" ng-model="tipo">
+                        <span class="checkmarkRadio"></span>
+                    </label>
+                      <button id="guardaTipo" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="verModal()" data-loading-text="Guardando..." style="width: 100px" ng->Guardar</button>
+                </div>
+            </div>
+        <section/>
+   </div>
+   <br>
+   <br>
+   <br>
+   <div class="spiner">
+    <div class="row">          
+        <div id="loader">
+            <div class="spinner">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div> 
+        </div>   
+    </div>
+</div>
+    <div class="row" ng-show="verGrid">
+        <div class="col-sm-11">
+            <div class="table-responsive">
+                <table id="provedores" class="table table-hover" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class="idProvee">Id<input type="text" class="filtro-tabla busca"></th>
+                            <th>Proveedor<input type="text" class="filtro-tabla busca"></th>
+                            <th>Tipo</th>
+                            <th style="text-align: center;">Selecciona</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="provedor in provedores" >
+                            <td class="idProvee">{{provedor.idpersona}}</td>
+                            <td>{{provedor.persona}}</td>
+                            <td>{{provedor.pag_TipoProveedor}}</td>
+                            <td style="text-align: center;">
+                           <input id="ch{{provedor.idpersona}}" type="checkbox" name="autch" ng-click="selecciona(provedor)" ng-model="provedor.seleccionada" style="width:18px;height:18px;" 
+                               >
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+ 
+</div>
