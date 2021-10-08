@@ -10,7 +10,7 @@ console.log('revisando');
 cron.schedule('* * * * *', function() {
     console.log('CRON');
 
-    var url='http://192.168.20.89/PagosApi/api/pagoapi/?id=15%7C1%7C10423';
+    var url='http://192.168.20.123/PagosApi/api/pagoapi/?id=15%7C1%7C10423';
     
     Request.post(url,  (error, response, body) => {
         if (!error) {

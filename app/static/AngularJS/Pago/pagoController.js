@@ -229,7 +229,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
             if (res.data.length > 1) {
                 angular.forEach(res.data, function(value) {
                     to = value.USU_CORREO + ';'
-                    link = 'http://192.168.20.89:3600/?idLote=' + idlote + '&idOperacion=2&idAprobador=' + value.USUARIO_AUTORIZA1 + '&idAprobacion=758169&idNotify=389585'
+                    link = 'http://192.168.20.123:3600/?idLote=' + idlote + '&idOperacion=2&idAprobador=' + value.USUARIO_AUTORIZA1 + '&idAprobacion=758169&idNotify=389585'
                     subject = 'GA - Aprobación de Lote ' + idlote + ' ' + value.RazonSocial;
                     html = '<p>Buen día estimado colaborador</p><br>Favor de revisar el lote #' + idlote + '<br><p>Solo de clic <a href="' + link + '">AQUI</a></p><br><br>';
 
@@ -1604,7 +1604,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                     type: 'boolean',
                     cellTemplate: '<input type="checkbox" ng-model="row.entity.agrupar">'
                 },
-                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.89:3200/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
+                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.123:3200/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
                 { name: 'monto', displayName: 'Monto', width: '10%', cellFilter: 'currency', enableCellEdit: false },
                 {
                     name: 'Pagar',
@@ -2039,7 +2039,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                 },
                 { name: 'proveedor', displayName: 'Proveedor', width: '15%', enableCellEdit: false, headerTooltip: 'Nombre del provedor', cellClass: 'cellToolTip' },
                 { name: 'documento', displayName: '# Documento', width: '15%', enableCellEdit: false, headerTooltip: 'Documento # de factura del provedor', cellClass: 'cellToolTip' },
-                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.89:3600/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
+                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.123:3600/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
                 { name: 'monto', displayName: 'Monto', width: '15%', cellFilter: 'currency', enableCellEdit: false },
                 { name: 'saldo', displayName: 'Saldo', width: '15%', cellFilter: 'currency', enableCellEdit: false }, {
                     name: 'Pagar',
@@ -2128,7 +2128,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                 },
                 { name: 'proveedor', displayName: 'Proveedor', width: '15%', enableCellEdit: false, headerTooltip: 'Nombre del provedor', cellClass: 'cellToolTip' },
                 { name: 'documento', displayName: '# Documento', width: '15%', enableCellEdit: false, headerTooltip: 'Documento # de factura del provedor', cellClass: 'cellToolTip' },
-                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.89:3600/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
+                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.123:3600/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
                 { name: 'monto', displayName: 'Monto', width: '15%', cellFilter: 'currency', enableCellEdit: false },
                 { name: 'saldo', displayName: 'Saldo', width: '15%', cellFilter: 'currency', enableCellEdit: false }, {
                     name: 'Pagar',
