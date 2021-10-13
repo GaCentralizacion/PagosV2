@@ -53,7 +53,8 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
     $rootScope.lgentra = 1;
 
     $rootScope.empleado = [];
-
+    //08/10/2021
+    $scope.gridApi1 = [];
 
 
     var errorCallBack = function(data, status, headers, config) {
@@ -2433,6 +2434,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
     }
     //LQMA funcion para guardar datos del grid (se implementara para guardar Ingresos bancos, otros , Transferencias)
     $scope.Guardar = function(opcion, valor) {
+        console.log($scope.idLote, 'Aqui ya tengo el id Loteeeee???');
         var result = $scope.changeFechaAplicacion();
         console.log("Guardar", result);
 
@@ -2578,97 +2580,180 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
 
                 if (pasaxCIE) {
                     if ((pasaxegresos) && (opcion != 2) && (opcion != 3) && (pasaxbancoDestino)) {
+                        if ($scope.idLote > 0) {
+                            console.log('Aqui ira toda la logica para actualizar');
+                            $scope.idLotePadre = $scope.idLote;
+                            var array = [];
+                            var count = 1;
+                            rows.forEach(function(row, i) {
+                                var elemento = {};
+                                elemento.pal_id_lote_pago = $scope.idLotePadre; //response.data;
+                                elemento.pad_polTipo = row.polTipo; //entity.polTipo;
+                                elemento.pad_polAnnio = row.annio;
+                                elemento.pad_polMes = row.polMes;
+                                elemento.pad_polConsecutivo = row.polConsecutivo;
+                                elemento.pad_polMovimiento = row.polMovimiento;
+                                elemento.pad_fechaPromesaPago = (row.fechaPromesaPago == '' ? '1900-01-01T00:00:00' : row.fechaPromesaPago);
 
-                        pagoRepository.getPagosPadre($rootScope.idEmpresa, $rootScope.currentEmployee, $scope.formData.nombreLoteNuevo, $scope.idLotePadre, EsPagoDirecto, ($scope.grdApagar).toFixed(2), '2019-10-09')
-                            .then(function successCallback(response) {
-                                console.error("getPagosPadre", response)
+                                elemento.pad_saldo = parseFloat(row.Pagar) + .00000001; //row.saldo;//
+                                //15062018
 
-                                // 
-                                pagoRepository.getFechaAplicacion(response.data, $scope.fechaAplicacion);
+                                if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
+                                    row.referencia = "AUT";
+                                } else {
+                                    if (row.convenioCIE == "") {
+                                        //row.referencia = $scope.idLotePadre + '-' + row.idProveedor + '-' + row.referencia.replace(" ", "");
+                                    }
+                                }
 
-                                $scope.idLotePadre = response.data;
-                                var array = [];
-                                var count = 1;
-                                rows.forEach(function(row, i) {
-                                    var elemento = {};
-                                    elemento.pal_id_lote_pago = $scope.idLotePadre; //response.data;
-                                    elemento.pad_polTipo = row.polTipo; //entity.polTipo;
-                                    elemento.pad_polAnnio = row.annio;
-                                    elemento.pad_polMes = row.polMes;
-                                    elemento.pad_polConsecutivo = row.polConsecutivo;
-                                    elemento.pad_polMovimiento = row.polMovimiento;
-                                    elemento.pad_fechaPromesaPago = (row.fechaPromesaPago == '' ? '1900-01-01T00:00:00' : row.fechaPromesaPago);
+                                //fin 15062018
 
-                                    elemento.pad_saldo = parseFloat(row.Pagar) + .00000001; //row.saldo;//
-                                    //15062018
 
-                                    if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
-                                        row.referencia = "AUT";
-                                    } else {
-                                        if (row.convenioCIE == "") {
-                                            //row.referencia = $scope.idLotePadre + '-' + row.idProveedor + '-' + row.referencia.replace(" ", "");
+                                elemento.pad_documento = row.documento;
+                                elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
+                                elemento.tab_revision = 1;
+                                if (row.agrupar == 1) {
+                                    elemento.pad_agrupamiento = count;
+                                } else {
+                                    elemento.pad_agrupamiento = row.agrupar;
+                                }
+
+                                elemento.pad_bancoPagador = $scope.bancoPago.cuenta;
+                                var lonbancodestino = row.cuentaDestino.length;
+                                var primerparentesis = row.cuentaDestino.indexOf("(", 0)
+                                var numcuentaDestino = row.cuentaDestino.substring(primerparentesis + 1, lonbancodestino)
+                                var res = numcuentaDestino.replace("(", "");
+                                res = res.replace(")", "");
+                                res = res.replace(",", "");
+                                res = res.replace(",", "");
+                                res = res.replace(",", "");
+                                res = res.replace(" ", "");
+                                elemento.pad_bancoDestino = res;
+                                array.push(elemento);
+                                count = count + 1;
+                            });
+
+
+                            var jsIngresos = angular.toJson($scope.ingresos); //delete $scope.ingresos['$$hashKey'];
+                            var jsTransf = angular.toJson($scope.transferencias);
+                            var jsEgresos = angular.toJson($scope.egresos);
+                            pagoRepository.setDatos(array, $rootScope.currentEmployee, $scope.idLotePadre, jsIngresos, jsTransf, $scope.caja, $scope.cobrar, jsEgresos, ($scope.estatusLote == 0) ? 1 : 2)
+                                .then(function successCallback(response) {
+                                    console.error("setDatos", response)
+                                    alertFactory.success('Se guardaron los datos.');
+                                    $scope.estatusLote = 1;
+                                    angular.forEach($scope.noLotes.data, function(lote, key) {
+                                        if (lote.idLotePago == $scope.idLote) {
+                                            lote.idLotePago = $scope.idLotePadre;
+                                            lote.estatus = 1;
                                         }
-                                    }
+                                    });
+                                    $('#btnGuardando').button('reset');
 
-                                    //fin 15062018
 
 
-                                    elemento.pad_documento = row.documento;
-                                    elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
-                                    elemento.tab_revision = 1;
-                                    if (row.agrupar == 1) {
-                                        elemento.pad_agrupamiento = count;
-                                    } else {
-                                        elemento.pad_agrupamiento = row.agrupar;
-                                    }
-
-                                    elemento.pad_bancoPagador = $scope.bancoPago.cuenta;
-                                    var lonbancodestino = row.cuentaDestino.length;
-                                    var primerparentesis = row.cuentaDestino.indexOf("(", 0)
-                                    var numcuentaDestino = row.cuentaDestino.substring(primerparentesis + 1, lonbancodestino)
-                                    var res = numcuentaDestino.replace("(", "");
-                                    res = res.replace(")", "");
-                                    res = res.replace(",", "");
-                                    res = res.replace(",", "");
-                                    res = res.replace(",", "");
-                                    res = res.replace(" ", "");
-                                    elemento.pad_bancoDestino = res;
-                                    array.push(elemento);
-                                    count = count + 1;
+                                }, function errorCallback(response) {
+                                    alertFactory.error('Error al guardar Datos');
+                                    $('#btnGuardando').button('reset');
+                                    $('#btnAprobar').button('reset');
                                 });
 
 
-                                var jsIngresos = angular.toJson($scope.ingresos); //delete $scope.ingresos['$$hashKey'];
-                                var jsTransf = angular.toJson($scope.transferencias);
-                                var jsEgresos = angular.toJson($scope.egresos);
-                                pagoRepository.setDatos(array, $rootScope.currentEmployee, $scope.idLotePadre, jsIngresos, jsTransf, $scope.caja, $scope.cobrar, jsEgresos, ($scope.estatusLote == 0) ? 1 : 2)
-                                    .then(function successCallback(response) {
-                                        console.error("setDatos", response)
-                                        alertFactory.success('Se guardaron los datos.');
-                                        $scope.estatusLote = 1;
-                                        angular.forEach($scope.noLotes.data, function(lote, key) {
-                                            if (lote.idLotePago == $scope.idLote) {
-                                                lote.idLotePago = $scope.idLotePadre;
-                                                lote.estatus = 1;
+
+                            $('#btnguardando').button('reset');
+                        } else {
+                            pagoRepository.getPagosPadre($rootScope.idEmpresa, $rootScope.currentEmployee, $scope.formData.nombreLoteNuevo, $scope.idLotePadre, EsPagoDirecto, ($scope.grdApagar).toFixed(2), '2019-10-09')
+                                .then(function successCallback(response) {
+                                    console.error("getPagosPadre", response)
+
+                                    // 
+                                    pagoRepository.getFechaAplicacion(response.data, $scope.fechaAplicacion);
+
+                                    $scope.idLotePadre = response.data;
+                                    var array = [];
+                                    var count = 1;
+                                    rows.forEach(function(row, i) {
+                                        var elemento = {};
+                                        elemento.pal_id_lote_pago = $scope.idLotePadre; //response.data;
+                                        elemento.pad_polTipo = row.polTipo; //entity.polTipo;
+                                        elemento.pad_polAnnio = row.annio;
+                                        elemento.pad_polMes = row.polMes;
+                                        elemento.pad_polConsecutivo = row.polConsecutivo;
+                                        elemento.pad_polMovimiento = row.polMovimiento;
+                                        elemento.pad_fechaPromesaPago = (row.fechaPromesaPago == '' ? '1900-01-01T00:00:00' : row.fechaPromesaPago);
+
+                                        elemento.pad_saldo = parseFloat(row.Pagar) + .00000001; //row.saldo;//
+                                        //15062018
+
+                                        if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
+                                            row.referencia = "AUT";
+                                        } else {
+                                            if (row.convenioCIE == "") {
+                                                //row.referencia = $scope.idLotePadre + '-' + row.idProveedor + '-' + row.referencia.replace(" ", "");
                                             }
-                                        });
-                                        $('#btnGuardando').button('reset');
+                                        }
+
+                                        //fin 15062018
 
 
+                                        elemento.pad_documento = row.documento;
+                                        elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
+                                        elemento.tab_revision = 1;
+                                        if (row.agrupar == 1) {
+                                            elemento.pad_agrupamiento = count;
+                                        } else {
+                                            elemento.pad_agrupamiento = row.agrupar;
+                                        }
 
-                                    }, function errorCallback(response) {
-                                        alertFactory.error('Error al guardar Datos');
-                                        $('#btnGuardando').button('reset');
-                                        $('#btnAprobar').button('reset');
+                                        elemento.pad_bancoPagador = $scope.bancoPago.cuenta;
+                                        var lonbancodestino = row.cuentaDestino.length;
+                                        var primerparentesis = row.cuentaDestino.indexOf("(", 0)
+                                        var numcuentaDestino = row.cuentaDestino.substring(primerparentesis + 1, lonbancodestino)
+                                        var res = numcuentaDestino.replace("(", "");
+                                        res = res.replace(")", "");
+                                        res = res.replace(",", "");
+                                        res = res.replace(",", "");
+                                        res = res.replace(",", "");
+                                        res = res.replace(" ", "");
+                                        elemento.pad_bancoDestino = res;
+                                        array.push(elemento);
+                                        count = count + 1;
                                     });
 
 
+                                    var jsIngresos = angular.toJson($scope.ingresos); //delete $scope.ingresos['$$hashKey'];
+                                    var jsTransf = angular.toJson($scope.transferencias);
+                                    var jsEgresos = angular.toJson($scope.egresos);
+                                    pagoRepository.setDatos(array, $rootScope.currentEmployee, $scope.idLotePadre, jsIngresos, jsTransf, $scope.caja, $scope.cobrar, jsEgresos, ($scope.estatusLote == 0) ? 1 : 2)
+                                        .then(function successCallback(response) {
+                                            console.error("setDatos", response)
+                                            alertFactory.success('Se guardaron los datos.');
+                                            $scope.estatusLote = 1;
+                                            angular.forEach($scope.noLotes.data, function(lote, key) {
+                                                if (lote.idLotePago == $scope.idLote) {
+                                                    lote.idLotePago = $scope.idLotePadre;
+                                                    lote.estatus = 1;
+                                                }
+                                            });
+                                            $('#btnGuardando').button('reset');
 
-                                $('#btnguardando').button('reset');
-                            }, function errorCallback(response) {
-                                alertFactory.error('Error al insertar en tabla padre.');
-                                $('#btnguardando').button('reset');
-                            });
+
+
+                                        }, function errorCallback(response) {
+                                            alertFactory.error('Error al guardar Datos');
+                                            $('#btnGuardando').button('reset');
+                                            $('#btnAprobar').button('reset');
+                                        });
+
+
+
+                                    $('#btnguardando').button('reset');
+                                }, function errorCallback(response) {
+                                    alertFactory.error('Error al insertar en tabla padre.');
+                                    $('#btnguardando').button('reset');
+                                });
+
+                        }
 
                     };
                 } else {
@@ -3350,7 +3435,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
     $scope.dateOptions = {
         //dateDisabled: disabled,
         formatYear: 'yy',
-       // maxDate: new Date(2020, 5, 22),
+        // maxDate: new Date(2020, 5, 22),
         //minDate: new Date(),
         startingDay: 1
     };
@@ -3470,6 +3555,88 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
         $('#btnAprobar').button('loading');
         $scope.Guardar(3, valor);
     };
+    var actualizaLote = function() {
+        console.log('Aqui ira toda la logica para actualizar');
+        $scope.idLotePadre = $scope.idLote;
+        var array = [];
+        var count = 1;
+        rows.forEach(function(row, i) {
+            var elemento = {};
+            elemento.pal_id_lote_pago = $scope.idLotePadre; //response.data;
+            elemento.pad_polTipo = row.polTipo; //entity.polTipo;
+            elemento.pad_polAnnio = row.annio;
+            elemento.pad_polMes = row.polMes;
+            elemento.pad_polConsecutivo = row.polConsecutivo;
+            elemento.pad_polMovimiento = row.polMovimiento;
+            elemento.pad_fechaPromesaPago = (row.fechaPromesaPago == '' ? '1900-01-01T00:00:00' : row.fechaPromesaPago);
+
+            elemento.pad_saldo = parseFloat(row.Pagar) + .00000001; //row.saldo;//
+            //15062018
+
+            if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
+                row.referencia = "AUT";
+            } else {
+                if (row.convenioCIE == "") {
+                    //row.referencia = $scope.idLotePadre + '-' + row.idProveedor + '-' + row.referencia.replace(" ", "");
+                }
+            }
+
+            //fin 15062018
+
+
+            elemento.pad_documento = row.documento;
+            elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
+            elemento.tab_revision = 1;
+            if (row.agrupar == 1) {
+                elemento.pad_agrupamiento = count;
+            } else {
+                elemento.pad_agrupamiento = row.agrupar;
+            }
+
+            elemento.pad_bancoPagador = $scope.bancoPago.cuenta;
+            var lonbancodestino = row.cuentaDestino.length;
+            var primerparentesis = row.cuentaDestino.indexOf("(", 0)
+            var numcuentaDestino = row.cuentaDestino.substring(primerparentesis + 1, lonbancodestino)
+            var res = numcuentaDestino.replace("(", "");
+            res = res.replace(")", "");
+            res = res.replace(",", "");
+            res = res.replace(",", "");
+            res = res.replace(",", "");
+            res = res.replace(" ", "");
+            elemento.pad_bancoDestino = res;
+            array.push(elemento);
+            count = count + 1;
+        });
+
+
+        var jsIngresos = angular.toJson($scope.ingresos); //delete $scope.ingresos['$$hashKey'];
+        var jsTransf = angular.toJson($scope.transferencias);
+        var jsEgresos = angular.toJson($scope.egresos);
+        pagoRepository.setDatos(array, $rootScope.currentEmployee, $scope.idLotePadre, jsIngresos, jsTransf, $scope.caja, $scope.cobrar, jsEgresos, ($scope.estatusLote == 0) ? 1 : 2)
+            .then(function successCallback(response) {
+                console.error("setDatos", response)
+                alertFactory.success('Se guardaron los datos.');
+                $scope.estatusLote = 1;
+                angular.forEach($scope.noLotes.data, function(lote, key) {
+                    if (lote.idLotePago == $scope.idLote) {
+                        lote.idLotePago = $scope.idLotePadre;
+                        lote.estatus = 1;
+                    }
+                });
+                $('#btnGuardando').button('reset');
+
+
+
+            }, function errorCallback(response) {
+                alertFactory.error('Error al guardar Datos');
+                $('#btnGuardando').button('reset');
+                $('#btnAprobar').button('reset');
+            });
+
+
+
+        $('#btnguardando').button('reset');
+    };
 }) //LQMA fin bloque controller
 registrationModule.service('stats', function() {
     var coreAccumulate = function(aggregation, value) {
@@ -3543,4 +3710,5 @@ registrationModule.service('stats', function() {
         },
     };
     return service;
+
 });
