@@ -171,4 +171,20 @@ pagosNode.prototype.get_correos = function(req, res, next){
     });
 }
 
+pagosNode.prototype.get_cuentaCie = function(req, res, next){
+    var self = this;
+    var params = [
+            { name: 'cuenta', value: req.query.IdLote, type: self.model.types.STRING },
+            { name: 'idEmpresa', value: req.query.FechaAplicacion, type: self.model.types.INT },
+            { name: 'idProveedor', value: req.query.FechaAplicacion, type: self.model.types.INT }
+        ];
+
+    this.model.query('SEL_CUENTA_CIE_SP', params, function(error,  result){
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+}
+
 module.exports = pagosNode;

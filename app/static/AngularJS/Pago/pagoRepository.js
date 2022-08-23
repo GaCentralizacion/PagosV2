@@ -399,9 +399,22 @@ registrationModule.factory('pagoRepository', function($http) {
                     'Content-Type': 'application/json'
                 }
             });
-        }
+        },
         //FAL
-
+        getCuentaCie: function(cuenta, idEmpresa, idProveedor) {
+            return $http({
+                url: pagosNodeUrl + 'cuentaCie/',
+                method: "GET",
+                params: {
+                    cuenta,
+                    idEmpresa,
+                    idProveedor
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
 
 
     };

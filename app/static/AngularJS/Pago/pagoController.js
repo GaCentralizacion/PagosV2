@@ -2466,323 +2466,331 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
         }, 500);
     }; //fin de funcion cancelar
     var guardaValida = function(negativos, saldo, opcion, valor) {
+        var rows = $scope.gridApi1.selection.getSelectedRows();
 
-        pasaxbancoDestino = false;
+        let promesaCuentas = [];
+        rows.some(function(row, i, j) {
+            promesaCuentas.push(pagoRepository.getCuentaCie(row.cuentaDestino, row.empresa, row.idProveedor));
+        });
+        Promise.all(promesaCuentas).then(function(results) {
+            console.log(results);
+            pasaxbancoDestino = false;
 
-        if (!($('#lgnUser').val().indexOf('[') > -1)) {
-            localStorageService.set('lgnUser', $('#lgnUser').val());
-        } else {
-            if (($('#lgnUser').val().indexOf('[') > -1) && !localStorageService.get('lgnUser')) {
-                if (getParameterByName('employee') != '') {
-                    $rootScope.currentEmployee = getParameterByName('employee');
-                } else {
-                    alert('Inicie sesión desde panel de aplicaciones.');
-                    //window.close(); 
+            if (!($('#lgnUser').val().indexOf('[') > -1)) {
+                localStorageService.set('lgnUser', $('#lgnUser').val());
+            } else {
+                if (($('#lgnUser').val().indexOf('[') > -1) && !localStorageService.get('lgnUser')) {
+                    if (getParameterByName('employee') != '') {
+                        $rootScope.currentEmployee = getParameterByName('employee');
+                    } else {
+                        alert('Inicie sesión desde panel de aplicaciones.');
+                        //window.close(); 
+                    }
+
                 }
+            }
+
+            if (valor == 3) {
+                saldo = 0.01;
 
             }
-        }
 
-        if (valor == 3) {
-            saldo = 0.01;
-
-        }
-
-        if ($scope.selPlantaBanco) {
-            saldo = 0.01;
-        }
-        if (negativos > 0) {
-            alertFactory.warning('Existen disponibles en valores negativos. Verifique las transferencias.');
-            $('#btnGuardando').button('reset');
-        } else
-        if (saldo <= 0) {
-            alertFactory.warning('La sumatoria del saldo de cuentas de Ingreso no puede ser cero.');
-            $('#btnGuardando').button('reset');
-        } else {
-            var rows = $scope.gridApi1.selection.getSelectedRows();
-
-            if (rows.length == 0 && $rootScope.verbusqueda == false) {
-                alertFactory.warning('Debe seleccionar al menos un documento para guardar un lote.');
+            if ($scope.selPlantaBanco) {
+                saldo = 0.01;
+            }
+            if (negativos > 0) {
+                alertFactory.warning('Existen disponibles en valores negativos. Verifique las transferencias.');
                 $('#btnGuardando').button('reset');
-                $('#btnAprobar').button('reset');
+            } else
+            if (saldo <= 0) {
+                alertFactory.warning('La sumatoria del saldo de cuentas de Ingreso no puede ser cero.');
+                $('#btnGuardando').button('reset');
             } else {
 
+                if (rows.length == 0 && $rootScope.verbusqueda == false) {
+                    alertFactory.warning('Debe seleccionar al menos un documento para guardar un lote.');
+                    $('#btnGuardando').button('reset');
+                    $('#btnAprobar').button('reset');
+                } else {
 
-                var EsPagoDirecto = 0;
-                if ($scope.selPlantaBanco) {
-                    EsPagoDirecto = 1
-                }
 
-                var pasaxegresos = true;
-                angular.forEach($scope.egresos, function(egreso, key) {
-
-                    //if (egreso.excedente < $scope.montominimo) {
-                    if (((egreso.saldoIngreso + egreso.aTransferir) - $scope.grdApagar) < $scope.montominimo) {
-                        pasaxegresos = false;
-                        alertFactory.warning('Existe una cuenta con saldo menor al mínimo');
-                        $('#btnGuardando').button('reset');
-                    }
-                });
-
-                //FAL revisa que no haya un convenio CIE sin referencia
-                var pasaxCIE = true;
-                var proveedorCIE = '';
-                var pasaxbancoDestino = true;
-                var proveedorcuentaDestino = '';
-                rows.some(function(row, i, j) {
-
-                    if ((row.convenioCIE == null) || (row.convenioCIE == undefined) || (row.convenioCIE == "")) {
-                        pasaxCIE = true;
-                    } else {
-                        pasaxCIE = false;
+                    var EsPagoDirecto = 0;
+                    if ($scope.selPlantaBanco) {
+                        EsPagoDirecto = 1
                     }
 
-                    if (pasaxCIE == false) {
-                        if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
-                            proveedorCIE = row.proveedor;
-                            return true;
+                    var pasaxegresos = true;
+                    angular.forEach($scope.egresos, function(egreso, key) {
+
+                        //if (egreso.excedente < $scope.montominimo) {
+                        if (((egreso.saldoIngreso + egreso.aTransferir) - $scope.grdApagar) < $scope.montominimo) {
+                            pasaxegresos = false;
+                            alertFactory.warning('Existe una cuenta con saldo menor al mínimo');
+                            $('#btnGuardando').button('reset');
+                        }
+                    });
+
+                    //FAL revisa que no haya un convenio CIE sin referencia
+                    var pasaxCIE = true;
+                    var proveedorCIE = '';
+                    var pasaxbancoDestino = true;
+                    var proveedorcuentaDestino = '';
+                    rows.some(function(row, i, j) {
+
+                        if ((row.convenioCIE == null) || (row.convenioCIE == undefined) || (row.convenioCIE == "")) {
+                            pasaxCIE = true;
                         } else {
+                            pasaxCIE = false;
+                        }
 
-                            var ctrCuentaDestinoArr = row.cuentaDestino.split(',');
-
-                            if (ctrCuentaDestinoArr.length > 1) {
-                                pasaxbancoDestino = false;
-                                proveedorcuentaDestino = row.proveedor;
-                                alertFactory.warning('El proveedor CIE' + proveedorcuentaDestino + ' Tiene mas de una cuenta destino');
-                                $('#btnGuardando').button('reset');
-                                pasaxCIE = false;
+                        if (pasaxCIE == false) {
+                            if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
+                                proveedorCIE = row.proveedor;
                                 return true;
                             } else {
-                                pasaxCIE = true;
-                                return false;
+
+                                var ctrCuentaDestinoArr = row.cuentaDestino.split(',');
+
+                                if (ctrCuentaDestinoArr.length > 1) {
+                                    pasaxbancoDestino = false;
+                                    proveedorcuentaDestino = row.proveedor;
+                                    alertFactory.warning('El proveedor CIE' + proveedorcuentaDestino + ' Tiene mas de una cuenta destino');
+                                    $('#btnGuardando').button('reset');
+                                    pasaxCIE = false;
+                                    return true;
+                                } else {
+                                    pasaxCIE = true;
+                                    return false;
+                                }
+
+
+
+
                             }
-
-
-
-
                         }
-                    }
 
-                    var ctrCuentaDestinoArr = row.cuentaDestino.split(',');
+                        var ctrCuentaDestinoArr = row.cuentaDestino.split(',');
 
-                    if (ctrCuentaDestinoArr.length > 1) {
-                        pasaxbancoDestino = false;
-                        proveedorcuentaDestino = row.proveedor;
-                        alertFactory.warning('El proveedor ' + proveedorcuentaDestino + ' Tiene mas de una cuenta destino');
-                        $('#btnGuardando').button('reset');
-                        return true;
-                    }
+                        if (ctrCuentaDestinoArr.length > 1) {
+                            pasaxbancoDestino = false;
+                            proveedorcuentaDestino = row.proveedor;
+                            alertFactory.warning('El proveedor ' + proveedorcuentaDestino + ' Tiene mas de una cuenta destino');
+                            $('#btnGuardando').button('reset');
+                            return true;
+                        }
 
-                });
-
-
-                if (pasaxCIE) {
-                    if ((pasaxegresos) && (opcion != 2) && (opcion != 3) && (pasaxbancoDestino)) {
-
-                        pagoRepository.getPagosPadre($rootScope.idEmpresa, $rootScope.currentEmployee, $scope.formData.nombreLoteNuevo, $scope.idLotePadre, EsPagoDirecto, ($scope.grdApagar).toFixed(2), '2019-10-09')
-                            .then(function successCallback(response) {
-                                console.error("getPagosPadre", response)
-
-                                // 
-                                pagoRepository.getFechaAplicacion(response.data, $scope.fechaAplicacion);
-
-                                $scope.idLotePadre = response.data;
-                                var array = [];
-                                var count = 1;
-                                rows.forEach(function(row, i) {
-                                    var elemento = {};
-                                    elemento.pal_id_lote_pago = $scope.idLotePadre; //response.data;
-                                    elemento.pad_polTipo = row.polTipo; //entity.polTipo;
-                                    elemento.pad_polAnnio = row.annio;
-                                    elemento.pad_polMes = row.polMes;
-                                    elemento.pad_polConsecutivo = row.polConsecutivo;
-                                    elemento.pad_polMovimiento = row.polMovimiento;
-                                    elemento.pad_fechaPromesaPago = (row.fechaPromesaPago == '' ? '1900-01-01T00:00:00' : row.fechaPromesaPago);
-
-                                    elemento.pad_saldo = parseFloat(row.Pagar) + .00000001; //row.saldo;//
-                                    //15062018
-
-                                    if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
-                                        row.referencia = "AUT";
-                                    } else {
-                                        if (row.convenioCIE == "") {
-                                            //row.referencia = $scope.idLotePadre + '-' + row.idProveedor + '-' + row.referencia.replace(" ", "");
-                                        }
-                                    }
-
-                                    //fin 15062018
+                    });
 
 
-                                    elemento.pad_documento = row.documento;
-                                    elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
-                                    elemento.tab_revision = 1;
-                                    if (row.agrupar == 1) {
-                                        elemento.pad_agrupamiento = count;
-                                    } else {
-                                        elemento.pad_agrupamiento = row.agrupar;
-                                    }
+                    if (pasaxCIE) {
+                        if ((pasaxegresos) && (opcion != 2) && (opcion != 3) && (pasaxbancoDestino)) {
 
-                                    elemento.pad_bancoPagador = $scope.bancoPago.cuenta;
-                                    var lonbancodestino = row.cuentaDestino.length;
-                                    var primerparentesis = row.cuentaDestino.indexOf("(", 0)
-                                    var numcuentaDestino = row.cuentaDestino.substring(primerparentesis + 1, lonbancodestino)
-                                    var res = numcuentaDestino.replace("(", "");
-                                    res = res.replace(")", "");
-                                    res = res.replace(",", "");
-                                    res = res.replace(",", "");
-                                    res = res.replace(",", "");
-                                    res = res.replace(" ", "");
-                                    elemento.pad_bancoDestino = res;
-                                    array.push(elemento);
-                                    count = count + 1;
-                                });
+                            pagoRepository.getPagosPadre($rootScope.idEmpresa, $rootScope.currentEmployee, $scope.formData.nombreLoteNuevo, $scope.idLotePadre, EsPagoDirecto, ($scope.grdApagar).toFixed(2), '2019-10-09')
+                                .then(function successCallback(response) {
+                                    console.error("getPagosPadre", response)
 
+                                    // 
+                                    pagoRepository.getFechaAplicacion(response.data, $scope.fechaAplicacion);
 
-                                var jsIngresos = angular.toJson($scope.ingresos); //delete $scope.ingresos['$$hashKey'];
-                                var jsTransf = angular.toJson($scope.transferencias);
-                                var jsEgresos = angular.toJson($scope.egresos);
-                                pagoRepository.setDatos(array, $rootScope.currentEmployee, $scope.idLotePadre, jsIngresos, jsTransf, $scope.caja, $scope.cobrar, jsEgresos, ($scope.estatusLote == 0) ? 1 : 2)
-                                    .then(function successCallback(response) {
-                                        console.error("setDatos", response)
-                                        alertFactory.success('Se guardaron los datos.');
-                                        $scope.estatusLote = 1;
-                                        angular.forEach($scope.noLotes.data, function(lote, key) {
-                                            if (lote.idLotePago == $scope.idLote) {
-                                                lote.idLotePago = $scope.idLotePadre;
-                                                lote.estatus = 1;
+                                    $scope.idLotePadre = response.data;
+                                    var array = [];
+                                    var count = 1;
+                                    rows.forEach(function(row, i) {
+                                        var elemento = {};
+                                        elemento.pal_id_lote_pago = $scope.idLotePadre; //response.data;
+                                        elemento.pad_polTipo = row.polTipo; //entity.polTipo;
+                                        elemento.pad_polAnnio = row.annio;
+                                        elemento.pad_polMes = row.polMes;
+                                        elemento.pad_polConsecutivo = row.polConsecutivo;
+                                        elemento.pad_polMovimiento = row.polMovimiento;
+                                        elemento.pad_fechaPromesaPago = (row.fechaPromesaPago == '' ? '1900-01-01T00:00:00' : row.fechaPromesaPago);
+
+                                        elemento.pad_saldo = parseFloat(row.Pagar) + .00000001; //row.saldo;//
+                                        //15062018
+
+                                        if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
+                                            row.referencia = "AUT";
+                                        } else {
+                                            if (row.convenioCIE == "") {
+                                                //row.referencia = $scope.idLotePadre + '-' + row.idProveedor + '-' + row.referencia.replace(" ", "");
                                             }
-                                        });
-                                        $('#btnGuardando').button('reset');
+                                        }
+
+                                        //fin 15062018
 
 
+                                        elemento.pad_documento = row.documento;
+                                        elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
+                                        elemento.tab_revision = 1;
+                                        if (row.agrupar == 1) {
+                                            elemento.pad_agrupamiento = count;
+                                        } else {
+                                            elemento.pad_agrupamiento = row.agrupar;
+                                        }
 
-                                    }, function errorCallback(response) {
-                                        alertFactory.error('Error al guardar Datos');
-                                        $('#btnGuardando').button('reset');
-                                        $('#btnAprobar').button('reset');
+                                        elemento.pad_bancoPagador = $scope.bancoPago.cuenta;
+                                        var lonbancodestino = row.cuentaDestino.length;
+                                        var primerparentesis = row.cuentaDestino.indexOf("(", 0)
+                                        var numcuentaDestino = row.cuentaDestino.substring(primerparentesis + 1, lonbancodestino)
+                                        var res = numcuentaDestino.replace("(", "");
+                                        res = res.replace(")", "");
+                                        res = res.replace(",", "");
+                                        res = res.replace(",", "");
+                                        res = res.replace(",", "");
+                                        res = res.replace(" ", "");
+                                        elemento.pad_bancoDestino = res;
+                                        array.push(elemento);
+                                        count = count + 1;
                                     });
 
 
+                                    var jsIngresos = angular.toJson($scope.ingresos); //delete $scope.ingresos['$$hashKey'];
+                                    var jsTransf = angular.toJson($scope.transferencias);
+                                    var jsEgresos = angular.toJson($scope.egresos);
+                                    pagoRepository.setDatos(array, $rootScope.currentEmployee, $scope.idLotePadre, jsIngresos, jsTransf, $scope.caja, $scope.cobrar, jsEgresos, ($scope.estatusLote == 0) ? 1 : 2)
+                                        .then(function successCallback(response) {
+                                            console.error("setDatos", response)
+                                            alertFactory.success('Se guardaron los datos.');
+                                            $scope.estatusLote = 1;
+                                            angular.forEach($scope.noLotes.data, function(lote, key) {
+                                                if (lote.idLotePago == $scope.idLote) {
+                                                    lote.idLotePago = $scope.idLotePadre;
+                                                    lote.estatus = 1;
+                                                }
+                                            });
+                                            $('#btnGuardando').button('reset');
 
-                                $('#btnguardando').button('reset');
-                            }, function errorCallback(response) {
-                                alertFactory.error('Error al insertar en tabla padre.');
-                                $('#btnguardando').button('reset');
-                            });
 
+
+                                        }, function errorCallback(response) {
+                                            alertFactory.error('Error al guardar Datos');
+                                            $('#btnGuardando').button('reset');
+                                            $('#btnAprobar').button('reset');
+                                        });
+
+
+
+                                    $('#btnguardando').button('reset');
+                                }, function errorCallback(response) {
+                                    alertFactory.error('Error al insertar en tabla padre.');
+                                    $('#btnguardando').button('reset');
+                                });
+
+                        };
+                    } else {
+                        alertFactory.warning('Existe un documento del proveedor ' + proveedorCIE + ' con convenio CIE sin referencia');
+                        $('#btnGuardando').button('reset');
                     };
-                } else {
-                    alertFactory.warning('Existe un documento del proveedor ' + proveedorCIE + ' con convenio CIE sin referencia');
-                    $('#btnGuardando').button('reset');
-                };
 
-                if (opcion == 2) { //aprobacion
-                    $('#btnAprobar').prop('disabled', true);
-                    $('#btnRechazar').prop('disabled', true);
-                    //Guardo el lote
-                    var array = [];
-                    var count = 1;
-                    rows.forEach(function(row, i) {
-                        var elemento = {};
-                        elemento.pal_id_lote_pago = $scope.idLotePadre; //response.data;
-                        elemento.pad_polTipo = row.polTipo; //entity.polTipo;
-                        elemento.pad_polAnnio = row.annio;
-                        elemento.pad_polMes = row.polMes;
-                        elemento.pad_polConsecutivo = row.polConsecutivo;
-                        elemento.pad_polMovimiento = row.polMovimiento;
-                        elemento.pad_fechaPromesaPago = (row.fechaPromesaPago == '' ? '1900-01-01T00:00:00' : row.fechaPromesaPago);
+                    if (opcion == 2) { //aprobacion
+                        $('#btnAprobar').prop('disabled', true);
+                        $('#btnRechazar').prop('disabled', true);
+                        //Guardo el lote
+                        var array = [];
+                        var count = 1;
+                        rows.forEach(function(row, i) {
+                            var elemento = {};
+                            elemento.pal_id_lote_pago = $scope.idLotePadre; //response.data;
+                            elemento.pad_polTipo = row.polTipo; //entity.polTipo;
+                            elemento.pad_polAnnio = row.annio;
+                            elemento.pad_polMes = row.polMes;
+                            elemento.pad_polConsecutivo = row.polConsecutivo;
+                            elemento.pad_polMovimiento = row.polMovimiento;
+                            elemento.pad_fechaPromesaPago = (row.fechaPromesaPago == '' ? '1900-01-01T00:00:00' : row.fechaPromesaPago);
 
-                        elemento.pad_saldo = parseFloat(row.Pagar) + .00000001; //row.saldo;//
+                            elemento.pad_saldo = parseFloat(row.Pagar) + .00000001; //row.saldo;//
 
 
-                        if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
-                            row.referencia = "AUT";
-                        }
-                        elemento.pad_documento = row.documento;
-                        elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
-                        elemento.tab_revision = 1;
-                        if (row.agrupar == 1) {
-                            elemento.pad_agrupamiento = count;
-                        } else {
-                            elemento.pad_agrupamiento = row.agrupar;
-                        }
-
-                        elemento.pad_bancoPagador = row.bancoPagador;
-                        var lonbancodestino = row.cuentaDestino.length;
-                        var primerparentesis = row.cuentaDestino.indexOf("(", 0)
-                        var numcuentaDestino = row.cuentaDestino.substring(primerparentesis + 1, lonbancodestino)
-                        var res = numcuentaDestino.replace("(", "");
-                        res = res.replace(")", "");
-                        res = res.replace(",", "");
-                        res = res.replace(",", "");
-                        res = res.replace(",", "");
-                        res = res.replace(" ", "");
-                        elemento.pad_bancoDestino = res;
-                        array.push(elemento);
-                        count = count + 1;
-                    });
-
-                    // pagoRepository.setDatosAutoriza(array, $rootScope.currentEmployee, $scope.idLotePadre)
-                    //     .then(function successCallback(response) {
-                    //         alertFactory.success('Se guardaron los datos.');
-                    //       }, function errorCallback(response) {
-                    //         alertFactory.error('Error al guardar Datos');
-                    //     });
-
-                    pagoRepository.setAprobacion(1, valor, $rootScope.idEmpresa, $scope.idLotePadre, $rootScope.currentEmployee, $scope.idAprobador, $scope.idAprobacion, $scope.idNotify, $scope.formData.Observacion)
-                        .then(function successCallback(response) {
-                            if (valor == 3) {
-                                alertFactory.success('Se aprobo el lote con exito');
-                                $('#btnAprobar').button('reset');
-                            } else //rechazado
-                            {
-                                alertFactory.success('Se rechazo el lote con exito');
-                                $('#btnRechazar').button('reset');
+                            if ((row.referencia == null) || (row.referencia == undefined) || (row.referencia == "")) {
+                                row.referencia = "AUT";
                             }
-                            $scope.idOperacion = 0;
-
-
-                        }, function errorCallback(response) {
-                            if (valor == 3) {
-                                // alertFactory.error('Error al aprobar');
-                                $('#btnAprobar').button('reset');
-                                setTimeout(function() { window.close(); }, 1500);
-                            } else //rechazado
-                            {
-                                alertFactory.error('Error al rechazar');
-                                $('#btnRechazar').button('reset');
+                            elemento.pad_documento = row.documento;
+                            elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
+                            elemento.tab_revision = 1;
+                            if (row.agrupar == 1) {
+                                elemento.pad_agrupamiento = count;
+                            } else {
+                                elemento.pad_agrupamiento = row.agrupar;
                             }
+
+                            elemento.pad_bancoPagador = row.bancoPagador;
+                            var lonbancodestino = row.cuentaDestino.length;
+                            var primerparentesis = row.cuentaDestino.indexOf("(", 0)
+                            var numcuentaDestino = row.cuentaDestino.substring(primerparentesis + 1, lonbancodestino)
+                            var res = numcuentaDestino.replace("(", "");
+                            res = res.replace(")", "");
+                            res = res.replace(",", "");
+                            res = res.replace(",", "");
+                            res = res.replace(",", "");
+                            res = res.replace(" ", "");
+                            elemento.pad_bancoDestino = res;
+                            array.push(elemento);
+                            count = count + 1;
                         });
-                    setTimeout(function() { window.close(); }, 5000);
+
+                        // pagoRepository.setDatosAutoriza(array, $rootScope.currentEmployee, $scope.idLotePadre)
+                        //     .then(function successCallback(response) {
+                        //         alertFactory.success('Se guardaron los datos.');
+                        //       }, function errorCallback(response) {
+                        //         alertFactory.error('Error al guardar Datos');
+                        //     });
+
+                        pagoRepository.setAprobacion(1, valor, $rootScope.idEmpresa, $scope.idLotePadre, $rootScope.currentEmployee, $scope.idAprobador, $scope.idAprobacion, $scope.idNotify, $scope.formData.Observacion)
+                            .then(function successCallback(response) {
+                                if (valor == 3) {
+                                    alertFactory.success('Se aprobo el lote con exito');
+                                    $('#btnAprobar').button('reset');
+                                } else //rechazado
+                                {
+                                    alertFactory.success('Se rechazo el lote con exito');
+                                    $('#btnRechazar').button('reset');
+                                }
+                                $scope.idOperacion = 0;
+
+
+                            }, function errorCallback(response) {
+                                if (valor == 3) {
+                                    // alertFactory.error('Error al aprobar');
+                                    $('#btnAprobar').button('reset');
+                                    setTimeout(function() { window.close(); }, 1500);
+                                } else //rechazado
+                                {
+                                    alertFactory.error('Error al rechazar');
+                                    $('#btnRechazar').button('reset');
+                                }
+                            });
+                        setTimeout(function() { window.close(); }, 5000);
+                    }
+                    if (opcion == 3) { //aprobacion
+                        pagoRepository.setAplicacion($rootScope.idEmpresa, $scope.idLotePadre, $rootScope.currentEmployee)
+                            .then(function successCallback(response) {
+                                if (valor == 3) {
+                                    alertFactory.success('Se aprobo el lote con exito');
+                                    $('#btnAprobar').button('reset');
+                                } else //rechazado
+                                {
+                                    alertFactory.success('Se rechazo el lote con exito');
+                                    $('#btnRechazar').button('reset');
+                                }
+                                $scope.idOperacion = 0;
+                                setTimeout(function() { window.close(); }, 3500);
+                                $('#btnAprobar').prop('disabled', true);
+                                $('#btnRechazar').prop('disabled', true);
+                            }, function errorCallback(response) {
+                                if (valor == 3) {
+                                    alertFactory.error('Error al aprobar');
+                                    $('#btnAprobar').button('reset');
+                                } else //rechazado
+                                {
+                                    alertFactory.error('Error al rechazar');
+                                    $('#btnRechazar').button('reset');
+                                }
+                            });
+                    }
                 }
-                if (opcion == 3) { //aprobacion
-                    pagoRepository.setAplicacion($rootScope.idEmpresa, $scope.idLotePadre, $rootScope.currentEmployee)
-                        .then(function successCallback(response) {
-                            if (valor == 3) {
-                                alertFactory.success('Se aprobo el lote con exito');
-                                $('#btnAprobar').button('reset');
-                            } else //rechazado
-                            {
-                                alertFactory.success('Se rechazo el lote con exito');
-                                $('#btnRechazar').button('reset');
-                            }
-                            $scope.idOperacion = 0;
-                            setTimeout(function() { window.close(); }, 3500);
-                            $('#btnAprobar').prop('disabled', true);
-                            $('#btnRechazar').prop('disabled', true);
-                        }, function errorCallback(response) {
-                            if (valor == 3) {
-                                alertFactory.error('Error al aprobar');
-                                $('#btnAprobar').button('reset');
-                            } else //rechazado
-                            {
-                                alertFactory.error('Error al rechazar');
-                                $('#btnRechazar').button('reset');
-                            }
-                        });
-                }
-            }
-        } //fin else
+            } //fin else
+        });
+
     };
     /***************************************************************************************************************
         Funciones de guardado de datos
@@ -3350,7 +3358,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
     $scope.dateOptions = {
         //dateDisabled: disabled,
         formatYear: 'yy',
-       // maxDate: new Date(2020, 5, 22),
+        // maxDate: new Date(2020, 5, 22),
         //minDate: new Date(),
         startingDay: 1
     };
