@@ -2647,7 +2647,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
 
                                     elemento.pad_documento = row.documento;
                                     elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
-                                    elemento.pad_referenciaEspecial = row.referenciaNueva;
+                                    elemento.pad_referenciaEspecial = row.referenciaNueva ? row.referenciaNueva : '';
                                     elemento.tab_revision = 1;
                                     if (row.agrupar == 1) {
                                         elemento.pad_agrupamiento = count;
