@@ -1626,6 +1626,13 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                     visible: true,
                     enableCellEdit: true
                 },
+                {
+                    name: 'referenciaNueva',
+                    displayName: 'Referencia Numerica',
+                    width: '10%',
+                    visible: true,
+                    enableCellEdit: true
+                },
                 { name: 'tipo', width: '15%', displayName: 'Tipo', enableCellEdit: false },
                 { name: 'tipodocto', width: '15%', displayName: 'Tipo Documento', enableCellEdit: false },
                 { name: 'cartera', width: '15%', displayName: 'Cartera', enableCellEdit: false },
@@ -1718,6 +1725,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                         var childRows = row.treeNode.parentRow.treeNode.children;
                         var numchildRows = row.treeNode.parentRow.treeNode.aggregations[0].value;
                         var ctdSeleccionados = 0;
+                        row.referenciaNueva = '';
                         for (var j = 0; j < numchildRows; j++) {
                             if (childRows[j].row.isSelected == true) {
                                 ctdSeleccionados = ctdSeleccionados + 1;
@@ -1877,7 +1885,28 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                                 }
                             }
                         }
-
+                        //27/08/2022 valido la referencia Especial.
+                        if (colDef.name == 'referenciaNueva') {
+                           
+                            if (newValue.length > 7) {
+                                alertFactory.warning('La referencia numérica no puede tener más de 7 caracteres');
+                                rowEntity.referenciaNueva = oldValue;
+                                
+                            }
+                            const numbers = /^[0-9]+$/;
+                            if(!rowEntity.referenciaNueva.match(numbers))
+                            {
+                                alertFactory.warning('La referencia numérica debe contener solo números');
+                                rowEntity.referenciaNueva = ''
+                            }
+                            let rows = $scope.gridApi1.selection.getSelectedRows();
+                            angular.forEach(rows, function(element, key) {
+                                if(rowEntity.idProveedor == element.idProveedor && rowEntity.agrupar == 0 && rowEntity.referenciaNueva != element.referenciaNueva){
+                                    alertFactory.warning('La referencia numérica debe ser igual cuando es agrupado');
+                                    rowEntity.referenciaNueva = element.referenciaNueva
+                                }
+                            });
+                        }
 
                     } else {
                         alertFactory.warning('Solo se pueden modificar datos de los documentos seleccionados');
@@ -1886,6 +1915,9 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                         }
                         if (colDef.name == 'fechaPromesaPago') {
                             rowEntity.fechaPromesaPago = oldValue;
+                        }
+                        if (colDef.name == 'referenciaNueva') {
+                            rowEntity.referenciaNueva = '';
                         }
                     }
                 });
@@ -2698,6 +2730,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
 
                                         elemento.pad_documento = row.documento;
                                         elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
+                                        elemento.pad_referenciaEspecial = row.referenciaNueva ? row.referenciaNueva : '';
                                         elemento.tab_revision = 1;
                                         if (row.agrupar == 1) {
                                             elemento.pad_agrupamiento = count;
