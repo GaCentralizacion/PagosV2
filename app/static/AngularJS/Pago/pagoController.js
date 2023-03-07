@@ -230,7 +230,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
             if (res.data.length > 1) {
                 angular.forEach(res.data, function(value) {
                     to = value.USU_CORREO + ';'
-                    link = 'http://192.168.20.123:3600/?idLote=' + idlote + '&idOperacion=2&idAprobador=' + value.USUARIO_AUTORIZA1 + '&idAprobacion=758169&idNotify=389585'
+                    link = 'http://192.168.20.89:3600/?idLote=' + idlote + '&idOperacion=2&idAprobador=' + value.USUARIO_AUTORIZA1 + '&idAprobacion=758169&idNotify=389585'
                     subject = 'GA - Aprobación de Lote ' + idlote + ' ' + value.RazonSocial;
                     html = '<p>Buen día estimado colaborador</p><br>Favor de revisar el lote #' + idlote + '<br><p>Solo de clic <a href="' + link + '">AQUI</a></p><br><br>';
 
@@ -652,9 +652,9 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
             });
     };
 
-    $scope.liberarlote = function(idLote, documento) {
+    $scope.liberarlote = function(idLote, documento, idProveedor) {
         $scope.isDisabled = true;
-        pagoRepository.LiberaDocumento(idLote, documento).then(function successCallback(response) {
+        pagoRepository.LiberaDocumento(idLote, documento, idProveedor).then(function successCallback(response) {
             console.log(response.data);
             if (response.data.length == 0) {
                 $scope.isDisabled = false;
@@ -741,10 +741,10 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
             { name: 'descError', displayName: 'Error', width: '20%', visible: false },
             { name: 'totalPagar', displayName: 'Total a pagar', width: '10%', cellFilter: 'currency', enableCellEdit: false },
             { name: 'cuentaPago', displayName: 'Banco Pago', width: '15%', enableCellEdit: false },
-            { name: 'buscar', displayName: 'Buscar', width: '5%', cellTemplate: '<div><button class="btn btn-warning" ><span class="glyphicon glyphicon-search" ng-click="grid.appScope.ConsultaLoteObtieneBusqueda(row.entity,0,0)"></span></button></div>' },
-            { name: 'Aplicar', displayName: 'Aplicar', width: '5%', cellTemplate: '<div ng-show="(row.entity.estatus==3)"><button class="btn btn-info" ><span class="glyphicon glyphicon-floppy-saved" ng-click="grid.appScope.ConsultaLoteObtieneBusquedaAplicaDirecto(row.entity,0,0)"></span></button></div>' },
-            { name: 'Borrar', displayName: 'Borrar', width: '5%', cellTemplate: '<div ng-show="(row.entity.estatus==1)||(row.entity.estatus==2)"><button class="btn btn-danger" ><span class="glyphicon glyphicon-trash" ng-click="grid.appScope.borraLoteBtn(row.entity)"></span></button></div>' },
-            { name: 'Libera', displayName: 'Libera', width: '5%', cellTemplate: '<div ng-show="((row.entity.numdetalle - row.entity.numaplicado)>0)"><button class="btn btn-success" ><span class="glyphicon glyphicon-download-alt" ng-click="grid.appScope.modalLibera(row.entity.idLotePago)"></span></button></div>' },
+            { name: 'buscar', displayName: 'Buscar', width: '5%', cellTemplate: '<div><button class="btn btn-warning" ng-click="grid.appScope.ConsultaLoteObtieneBusqueda(row.entity,0,0)"><span class="glyphicon glyphicon-search"></span></button></div>' },
+            { name: 'Aplicar', displayName: 'Aplicar', width: '5%', cellTemplate: '<div ng-show="(row.entity.estatus==3)"><button class="btn btn-info" ng-click="grid.appScope.ConsultaLoteObtieneBusquedaAplicaDirecto(row.entity,0,0)"><span class="glyphicon glyphicon-floppy-saved"></span></button></div>' },
+            { name: 'Borrar', displayName: 'Borrar', width: '5%', cellTemplate: '<div ng-show="(row.entity.estatus==1)||(row.entity.estatus==2)"><button class="btn btn-danger" ng-click="grid.appScope.borraLoteBtn(row.entity)"><span class="glyphicon glyphicon-trash"></span></button></div>' },
+            { name: 'Libera', displayName: 'Libera', width: '5%', cellTemplate: '<div ng-show="((row.entity.numdetalle - row.entity.numaplicado)>0)"><button class="btn btn-success" ng-click="grid.appScope.modalLibera(row.entity.idLotePago)"><span class="glyphicon glyphicon-download-alt"></span></button></div>' },
         ];
 
 
@@ -1605,7 +1605,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                     type: 'boolean',
                     cellTemplate: '<input type="checkbox" ng-model="row.entity.agrupar">'
                 },
-                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.123:3200/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
+                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.89:3200/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
                 { name: 'monto', displayName: 'Monto', width: '10%', cellFilter: 'currency', enableCellEdit: false },
                 {
                     name: 'Pagar',
@@ -2072,7 +2072,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                 },
                 { name: 'proveedor', displayName: 'Proveedor', width: '15%', enableCellEdit: false, headerTooltip: 'Nombre del provedor', cellClass: 'cellToolTip' },
                 { name: 'documento', displayName: '# Documento', width: '15%', enableCellEdit: false, headerTooltip: 'Documento # de factura del provedor', cellClass: 'cellToolTip' },
-                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.123:3600/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
+                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.89:3600/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
                 { name: 'monto', displayName: 'Monto', width: '15%', cellFilter: 'currency', enableCellEdit: false },
                 { name: 'saldo', displayName: 'Saldo', width: '15%', cellFilter: 'currency', enableCellEdit: false }, {
                     name: 'Pagar',
@@ -2161,7 +2161,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                 },
                 { name: 'proveedor', displayName: 'Proveedor', width: '15%', enableCellEdit: false, headerTooltip: 'Nombre del provedor', cellClass: 'cellToolTip' },
                 { name: 'documento', displayName: '# Documento', width: '15%', enableCellEdit: false, headerTooltip: 'Documento # de factura del provedor', cellClass: 'cellToolTip' },
-                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.123:3600/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
+                { name: 'ordenCompra', displayName: 'Orden de compra', width: '13%', enableCellEdit: false, cellTemplate: '<div class="urlTabla" ng-class="col.colIndex()" ><a tooltip="Ver en digitalización" class="urlTabla" href="http://192.168.20.89:3600/?id={{row.entity.ordenCompra}}&employee=' + $scope.idEmpleado + '&proceso=1" target="_new">{{row.entity.ordenCompra}}</a></div>' },
                 { name: 'monto', displayName: 'Monto', width: '15%', cellFilter: 'currency', enableCellEdit: false },
                 { name: 'saldo', displayName: 'Saldo', width: '15%', cellFilter: 'currency', enableCellEdit: false }, {
                     name: 'Pagar',
@@ -2643,6 +2643,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
 
                                 elemento.pad_documento = row.documento;
                                 elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
+                                elemento.pad_referenciaEspecial = row.referenciaNueva ? row.referenciaNueva : '';
                                 elemento.tab_revision = 1;
                                 if (row.agrupar == 1) {
                                     elemento.pad_agrupamiento = count;
@@ -2818,6 +2819,7 @@ registrationModule.controller("pagoController", function($scope, $http, $interva
                         }
                         elemento.pad_documento = row.documento;
                         elemento.pad_polReferencia = row.referencia; //FAL 09052015 mandar referencia
+                        elemento.pad_referenciaEspecial = row.referenciaNueva ? row.referenciaNueva : '';
                         elemento.tab_revision = 1;
                         if (row.agrupar == 1) {
                             elemento.pad_agrupamiento = count;

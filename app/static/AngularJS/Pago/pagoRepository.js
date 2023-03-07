@@ -105,13 +105,13 @@ registrationModule.factory('pagoRepository', function($http) {
             });
         },
 
-        getliberar: function(id) {
-            return $http({
-                method: 'GET',
-                url: pagoUrl,
-                params: { id: '29|' + id }
-            });
-        },
+        // getliberar: function(id) {
+        //     return $http({
+        //         method: 'GET',
+        //         url: pagoUrl,
+        //         params: { id: '29|' + id }
+        //     });
+        // },
         getEncabezado: function(id) {
             return $http({
                 method: 'GET',
@@ -291,13 +291,13 @@ registrationModule.factory('pagoRepository', function($http) {
             });
         },
 
-        LiberaDocumento: function(idLote, documento) {
-            return $http({
-                url: pagoUrl,
-                method: "POST",
-                params: { id: '14|' + idLote + '|' + documento }
-            });
-        },
+        // LiberaDocumento: function(idLote, documento) {
+        //     return $http({
+        //         url: pagoUrl,
+        //         method: "POST",
+        //         params: { id: '14|' + idLote + '|' + documento }
+        //     });
+        // },
 
         //FAL 07062016 inserta el lote en la tabla final de aplicación
         setAplicacion: function(idEmpresa, idLote, idUsuario) {
@@ -401,7 +401,33 @@ registrationModule.factory('pagoRepository', function($http) {
             });
         }
         //FAL
-
+        ,
+        getliberar: function(idLote) {
+            return $http({
+                url: pagosNodeUrl + 'documentosLiberar/',
+                method: "GET",
+                params: {
+                    idLote
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        },
+        LiberaDocumento: function(idLote, documento, idProveedores) {
+            return $http({
+                url: pagosNodeUrl + 'liberaDocumentos/',
+                method: "POST",
+                data: {
+                    idLote,
+                    documento,
+                    idProveedores
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
 
 
     };

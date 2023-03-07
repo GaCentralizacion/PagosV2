@@ -171,4 +171,34 @@ pagosNode.prototype.get_correos = function(req, res, next){
     });
 }
 
+pagosNode.prototype.get_documentosLiberar = function(req, res, next){
+    var self = this;
+    var params = [
+            { name: 'idlote', value: req.query.idLote, type: self.model.types.INT }           
+        ];
+
+    this.model.query('SEL_LIBERAR_CXP_V2_SP', params, function(error,  result){
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+}
+
+pagosNode.prototype.post_liberaDocumentos = function(req, res, next){
+    var self = this;
+    var params = [
+            { name: 'idlote', value: req.body.idLote, type: self.model.types.INT },
+            { name: 'documento', value: req.body.documento, type: self.model.types.STRING },
+            { name: 'idProveedor', value: req.body.idProveedores, type: self.model.types.INT }            
+        ];
+
+    this.model.query('PROC_LIBERA_DOCUMENTO_V2_SP', params, function(error,  result){
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+}
+
 module.exports = pagosNode;
