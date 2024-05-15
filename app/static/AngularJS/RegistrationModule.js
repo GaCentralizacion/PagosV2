@@ -6,7 +6,10 @@
         templateUrl: '/AngularJS/Templates/Pago.html',
         controller: 'pagoController'
     });
-
+    // $routeProvider.when('/crearLote', {
+    //     templateUrl: '/AngularJS/Templates/CrearLote.html',
+    //     controller: 'pagoController'
+    // });
     $routeProvider.when('/pago', {
         templateUrl: '/AngularJS/Templates/Pago.html',
         controller: 'pagoController'

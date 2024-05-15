@@ -26,6 +26,7 @@ body,
 .st-container {
 	position: relative;
 	overflow: hidden;
+	height: 729px;
 }
 
 .st-pusher {

@@ -13,158 +13,280 @@ function isNumberKey(evt) {
 }
 </SCRIPT>
 <div cg-busy="myPromise" ng-init="init()" id="contentManager" resize>
-
-    
     <div ng-hide="vermodal">
-        <div data-keyboard="false" data-backdrop="static">
-            <div class="table-responsive">
-                <div class="table">
+        <div class="container-fluid" ng-init="init()"  ng-show="verlote">
+            <div class="row">
+        
+                <h4 class="modal-title" id="memberModalLabel">Crear un nuevo lote</h4>
+            </div>
+            <div class="row mt-1">
+                <div class="col-md-12"></div>
+                <div class="col-sm-12 col-md-6 mt-1">
+                    <label for="">Seleccione la empresa</label>
+                    <div id="">
+                        <div class="input-group">
+                            <input type="text" height="700" class="form-control" ng-model='traeTotalxEmpresa.emp_nombre'
+                                aria-label="...">
+                            <div class="input-group-btn">
+                                <button id="btnTotalxEmpresa" type="button" class="btn btn-info dropdown-toggle"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                    data-loading-text="Obteniendo cartera..." autocomplete="off">Seleccione <span
+                                        class="caret"></span></button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    <li ng-repeat="empresa in empresas">
+                                        <a href="#"
+                                            ng-click="traeTotalxEmpresa(empresa.emp_idempresa, empresa.emp_nombre,empresa.emp_nombrecto,empresa.rfc, empresa.tipo, empresa.pagoDirecto, empresa.monto_minimo)">{{empresa.emp_nombre}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 mt-1">
+                    <label for="">Cuenta</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" readonly="true" ng-model='bancoPago.cuenta' aria-label="...">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li ng-repeat="egreso in egresos">
+                                    <a href="#" class="egresosCombo" ng-click='selBancoPago(egreso)'>
+                                        {{egreso.cuenta}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col-md-6">
+                    <div class="btn-group">
+                        <label class="btn btn-primary" ng-model="radioTotales" uib-btn-radio="1">Todo</label>
+                        <label class="btn btn-primary" ng-model="radioTotales" uib-btn-radio="2">Pagable</label>
+                        <label class="btn btn-primary" ng-model="radioTotales" uib-btn-radio="3"="uncheckable">No
+                            Pagable</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div id="divnopagable" class="divTotales1" ng-hide="radioTotales != 1">
+                        <div id="mdContentSuma">
+                            <div class="rows">
+                                <div class="sumTexto">
+                                    Total cartera
+                                </div>
+                                <div class="sumMonto montoFinal">
+                                    {{GranTotalaPagar | currency}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="divnopagable" class="divTotales1" ng-hide="radioTotales != 2">
+                        <div id="mdContentSuma">
+                            <div class="rows">
+                                <div class="sumTexto">
+                                    Total pagable
+                                </div>
+                                <div class="sumMonto montoFinal">
+                                    {{GranTotalPagable | currency}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="divnopagable" class="divTotales1" ng-hide="radioTotales != 3">
+                        <div id="mdContentSuma">
+                            <div class="rows">
+                                <div class="sumTexto">
+                                    Total no pagable
+                                </div>
+                                <div class="sumMonto montoFinal">
+                                    {{GranTotalnoPagable | currency}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row  mt-1">
+                <div class="col-md-6 col-md-offset-6">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="nombreLote_2" class="col-md-4 control-label mdPagarLabel">Nombre del Lote</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="nombreLote_2" placeholder="" ng-model="formData.nombreLoteNuevo">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-primary" ng-disabled="isDisabled" ng-click="ActualizarCartera()"
+                            ng-show="buscarLotes">Actualizar
+                            Cartera</button>
+                        <button class="btn btn-info" data-toggle="modal" id="btnCrealotePD" href="#stack2"
+                            ng-click="IniciaLotePD()" ng-show="selPagoDirecto&&NuevoLote" data-loading-text="Creando lote..."
+                            autocomplete="off" ng-disabled="isDisabled">Crear lote de pago directo</button>
+                        <button class="btn btn-info" data-toggle="modal" id="btnCrealote" href="#stack2"
+                            ng-disabled="isDisabled" ng-click="IniciaLote()" data-loading-text="Creando lote..."
+                            autocomplete="off">Crear
+                            Lote</button>
+                        <button type="button" class="btn btn-primary" ng-show="ProgPago"
+                            ng-click="ProgramacionPagos()">Modificar Lote reciente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div ng-hide="true">
+            <div data-keyboard="false" data-backdrop="static">
+                <div class="table-responsive">
                     <div class="table">
-                        <h4 class="modal-title" id="memberModalLabel">Crear un nuevo lote</h4>
-                        <!-- /modal header -->
-                        <!--Tabla con la cabecera de titulos-->
                         <div class="table">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th height="70%">Seleccione la empresa</th>
-                                        <th height="20%"></th>
-                                        <th height="10%"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td height="70%">
-                                            <div id="selEmpresaCombo">
+                            <h4 class="modal-title" id="memberModalLabel">Crear un nuevo lote</h4>
+                            <div class="table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th height="70%">Seleccione la empresa</th>
+                                            <th height="20%"></th>
+                                            <th height="10%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td height="70%">
+                                                <div id="selEmpresaCombo">
+                                                    <div class="input-group">
+                                                        <input type="text" height="700" class="form-control" ng-model='traeTotalxEmpresa.emp_nombre' aria-label="...">
+                                                        <div class="input-group-btn">
+                                                            <button id="btnTotalxEmpresa" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-loading-text="Obteniendo cartera..." autocomplete="off">Seleccione <span class="caret"></span></button>
+                                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                                <li ng-repeat="empresa in empresas">
+                                                                    <a href="#" ng-click="traeTotalxEmpresa(empresa.emp_idempresa, empresa.emp_nombre,empresa.emp_nombrecto,empresa.rfc, empresa.tipo, empresa.pagoDirecto, empresa.monto_minimo)">{{empresa.emp_nombre}}</a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td height="50%">
                                                 <div class="input-group">
-                                                    <input type="text" height="700" class="form-control" ng-model='traeTotalxEmpresa.emp_nombre' aria-label="...">
+                                                    <input type="text" class="form-control" readonly="true" ng-model='bancoPago.cuenta' aria-label="...">
                                                     <div class="input-group-btn">
-                                                        <button id="btnTotalxEmpresa" type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-loading-text="Obteniendo cartera..." autocomplete="off">Seleccione <span class="caret"></span></button>
+                                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>
                                                         <ul class="dropdown-menu dropdown-menu-right">
-                                                            <li ng-repeat="empresa in empresas">
-                                                                <a href="#" ng-click="traeTotalxEmpresa(empresa.emp_idempresa, empresa.emp_nombre,empresa.emp_nombrecto,empresa.rfc, empresa.tipo, empresa.pagoDirecto, empresa.monto_minimo)">{{empresa.emp_nombre}}</a>
+                                                            <li ng-repeat="egreso in egresos">
+                                                                <a href="#" class="egresosCombo" ng-click='selBancoPago(egreso)'>
+                                                                    {{egreso.cuenta}}
+                                                                </a>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td height="50%">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control" readonly="true" ng-model='bancoPago.cuenta' aria-label="...">
-                                                <div class="input-group-btn">
-                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span class="caret"></span></button>
-                                                    <ul class="dropdown-menu dropdown-menu-right">
-                                                        <li ng-repeat="egreso in egresos">
-                                                            <a href="#" class="egresosCombo" ng-click='selBancoPago(egreso)'>
-                                                                {{egreso.cuenta}}
-                                                            </a>
-                                                        </li>
-                                                    </ul>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td height="50%">
+                                                <div class="btn-group">
+                                                    <label class="btn btn-primary" ng-model="radioTotales" uib-btn-radio="1">Todo</label>
+                                                    <label class="btn btn-primary" ng-model="radioTotales" uib-btn-radio="2">Pagable</label>
+                                                    <label class="btn btn-primary" ng-model="radioTotales" uib-btn-radio="3"="uncheckable">No Pagable</label>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td height="50%">
-                                            <div class="btn-group">
-                                                <label class="btn btn-primary" ng-model="radioTotales" uib-btn-radio="1">Todo</label>
-                                                <label class="btn btn-primary" ng-model="radioTotales" uib-btn-radio="2">Pagable</label>
-                                                <label class="btn btn-primary" ng-model="radioTotales" uib-btn-radio="3"="uncheckable">No Pagable</label>
-                                            </div>
-                                        </td>
-                                        <td height="50%">
-                                            <div id="divnopagable" class="divTotales1" ng-hide="radioTotales != 1">
-                                                <div id="mdContentSuma">
-                                                    <div class="rows">
-                                                        <div class="sumTexto">
-                                                            Total cartera
-                                                        </div>
-                                                        <div class="sumMonto montoFinal">
-                                                            {{GranTotalaPagar | currency}}
+                                            </td>
+                                            <td height="50%">
+                                                <div id="divnopagable" class="divTotales1" ng-hide="radioTotales != 1">
+                                                    <div id="mdContentSuma">
+                                                        <div class="rows">
+                                                            <div class="sumTexto">
+                                                                Total cartera
+                                                            </div>
+                                                            <div class="sumMonto montoFinal">
+                                                                {{GranTotalaPagar | currency}}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div id="divnopagable" class="divTotales1" ng-hide="radioTotales != 2">
-                                                <div id="mdContentSuma">
-                                                    <div class="rows">
-                                                        <div class="sumTexto">
-                                                            Total pagable
-                                                        </div>
-                                                        <div class="sumMonto montoFinal">
-                                                            {{GranTotalPagable | currency}}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!--FAL 10042016 listados de total no pagable  -->
-                                            <div id="divnopagable" class="divTotales1" ng-hide="radioTotales != 3">
-                                                <div id="mdContentSuma">
-                                                    <div class="rows">
-                                                        <div class="sumTexto">
-                                                            Total no pagable
-                                                        </div>
-                                                        <div class="sumMonto montoFinal">
-                                                            {{GranTotalnoPagable | currency}}
+                                                <div id="divnopagable" class="divTotales1" ng-hide="radioTotales != 2">
+                                                    <div id="mdContentSuma">
+                                                        <div class="rows">
+                                                            <div class="sumTexto">
+                                                                Total pagable
+                                                            </div>
+                                                            <div class="sumMonto montoFinal">
+                                                                {{GranTotalPagable | currency}}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="mdPagarLabel">
-                                                Nombre del Lote
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div id="mdContentSuma">
-                                                <input type="text" class="form-control" ng-model="formData.nombreLoteNuevo">
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td>
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <button type="button" class="btn btn-primary" ng-disabled="isDisabled" ng-click="ActualizarCartera()" ng-show="buscarLotes">Actualizar Cartera</button>
-                                                <button class="btn btn-info" data-toggle="modal" id="btnCrealotePD" href="#stack2" ng-click="IniciaLotePD()" ng-show="selPagoDirecto&&NuevoLote" data-loading-text="Creando lote..." autocomplete="off" ng-disabled="isDisabled">Crear lote de pago directo</button>
-                                                <button class="btn btn-info" data-toggle="modal" id="btnCrealote" href="#stack2" ng-disabled="isDisabled" ng-click="IniciaLote()" data-loading-text="Creando lote..." autocomplete="off">Crear Lote</button>
-                                                <button type="button" class="btn btn-primary" ng-show="ProgPago" ng-click="ProgramacionPagos()">Modificar Lote reciente</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                                <div id="divnopagable" class="divTotales1" ng-hide="radioTotales != 3">
+                                                    <div id="mdContentSuma">
+                                                        <div class="rows">
+                                                            <div class="sumTexto">
+                                                                Total no pagable
+                                                            </div>
+                                                            <div class="sumMonto montoFinal">
+                                                                {{GranTotalnoPagable | currency}}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="mdPagarLabel">
+                                                    Nombre del Lote
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div id="mdContentSuma">
+                                                    <input type="text" class="form-control" ng-model="formData.nombreLoteNuevo">
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <button type="button" class="btn btn-primary" ng-disabled="isDisabled" ng-click="ActualizarCartera()" ng-show="buscarLotes">Actualizar Cartera</button>
+                                                    <button class="btn btn-info" data-toggle="modal" id="btnCrealotePD" href="#stack2" ng-click="IniciaLotePD()" ng-show="selPagoDirecto&&NuevoLote" data-loading-text="Creando lote..." autocomplete="off" ng-disabled="isDisabled">Crear lote de pago directo</button>
+                                                    <button class="btn btn-info" data-toggle="modal" id="btnCrealote" href="#stack2" ng-disabled="isDisabled" ng-click="IniciaLote()" data-loading-text="Creando lote..." autocomplete="off">Crear Lote</button>
+                                                    <button type="button" class="btn btn-primary" ng-show="ProgPago" ng-click="ProgramacionPagos()">Modificar Lote reciente</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <!--FAL 10042016 listados de total pagable  -->
                 </div>
             </div>
-        </div>
-        <table class="table" height="800">
-            <thead>
-                <tr>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        
-                    </td>
-                    <td>
-                    </td>
-                </tr>
-
-                
-               
-            </tbody>
-        </table>
+            <table class="table" height="800">
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            
+                        </td>
+                        <td>
+                        </td>
+                    </tr>
+    
+                    
+                   
+                </tbody>
+            </table>
+        </div> -->
+        
     </div>
     <!-- FAL 03082017 -->
     <div ng-hide="verbusqueda">
