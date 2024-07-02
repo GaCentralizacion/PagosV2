@@ -1549,7 +1549,10 @@ registrationModule.controller("pagoController", function ($scope, $http, $interv
 
     //FAL crea los campos del grid y las rutinas en los eventos del grid.
     var ConfiguraGrid = function () {
-
+        let showAutorizador = false;
+        if ($scope.idNotify) {
+            showAutorizador = true;
+        }
         $scope.idEmpleado = $rootScope.currentEmployee;
         $scope.gridOptions = {
             enableColumnResize: true,
@@ -1679,7 +1682,8 @@ registrationModule.controller("pagoController", function ($scope, $http, $interv
             { name: 'tipoCartera', displayName: 'tipoCartera', width: '20%', enableCellEdit: false, visible: true },
             { name: 'numagrupar', displayName: 'numagrupar', width: '20%', enableCellEdit: false, visible: false },
             { name: 'bancoPagador', displayName: 'bancoPagador', width: '20%', enableCellEdit: false, visible: false },
-            { name: 'autorizado', displayName: 'Cuenta Autorizada', width: '20%', enableCellEdit: false, visible: true, cellTemplate: '<div ng-if="row.entity.autorizado == 1">Autorizado</div><div ng-if="row.entity.autorizado == 0">No autorizado</div>' }
+            { name: 'autorizado', displayName: 'Cuenta Autorizada', width: '20%', enableCellEdit: false, visible: true, cellTemplate: '<div ng-if="row.entity.autorizado == 1">Autorizado</div><div ng-if="row.entity.autorizado == 0">No autorizado</div>' },
+            { name: 'autorizadorOc', displayName: 'Autorizador', width: '20%', enableCellEdit: false, visible: showAutorizador }
             ],
 
             rowTemplate: '<div ng-class="{\'ordenBloqueada\':(row.entity.ordenBloqueada==\'True\' && ((row.entity.idEstatus < 1 || row.entity.idEstatus > 5) && row.entity.idEstatus != 20) && !row.isSelected)' +

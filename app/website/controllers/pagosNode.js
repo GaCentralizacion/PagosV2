@@ -205,7 +205,7 @@ pagosNode.prototype.get_cuentaAutorizadores = function(req, res, next){
     var self = this;
     var params = [
             { name: 'idEmpresa', value: req.query.idEmpresa, type: self.model.types.INT },
-            { name: 'cuenta', value: req.query.cuenta, type: self.model.types.STRING }            
+            { name: 'cuenta', value: req.query.cuenta, type: self.model.types.STRING }
         ];
 
     this.model.query('SEL_CUENTA_AUTORIZADORES', params, function(error,  result){
@@ -215,5 +215,17 @@ pagosNode.prototype.get_cuentaAutorizadores = function(req, res, next){
         });
     });
 }
+pagosNode.prototype.get_detalleLote = function(req, res, next){
+    var self = this;
+    var params = [
+            { name: 'idPadre', value: req.query.idLote, type: self.model.types.INT }
+        ];
 
+    this.model.query('SEL_PROG_PAGOS_GUARDADA_SP', params, function(error,  result){
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+}
 module.exports = pagosNode;

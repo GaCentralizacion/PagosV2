@@ -158,14 +158,14 @@ registrationModule.factory('pagoRepository', function($http) {
             });
         },
 
-        getDatosAprob: function(id) {
-            return $http({
-                method: 'GET',
-                url: pagoUrl,
-                params: { id: '5|' + id }
-            });
+        // getDatosAprob: function(id) {
+        //     return $http({
+        //         method: 'GET',
+        //         url: pagoUrl,
+        //         params: { id: '5|' + id }
+        //     });
 
-        },
+        // },
         getPagosPadre: function(idEmpresa, idEmpleado, nombreLote, idLote, esAplicacionDirecta, cifraControl) {
             return $http({
                 method: 'GET',
@@ -434,6 +434,18 @@ registrationModule.factory('pagoRepository', function($http) {
                 method: "GET",
                 params: {
                     idEmpresa, cuenta
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        },
+        getDatosAprob: function(idLote) {
+            return $http({
+                url: pagosNodeUrl + 'detalleLote/',
+                method: "GET",
+                params: {
+                    idLote
                 },
                 headers: {
                     'Content-Type': 'application/json'
