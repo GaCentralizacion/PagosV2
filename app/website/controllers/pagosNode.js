@@ -201,4 +201,19 @@ pagosNode.prototype.post_liberaDocumentos = function(req, res, next){
     });
 }
 
+pagosNode.prototype.get_cuentaAutorizadores = function(req, res, next){
+    var self = this;
+    var params = [
+            { name: 'idEmpresa', value: req.query.idEmpresa, type: self.model.types.INT },
+            { name: 'cuenta', value: req.query.cuenta, type: self.model.types.STRING }            
+        ];
+
+    this.model.query('SEL_CUENTA_AUTORIZADORES', params, function(error,  result){
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+}
+
 module.exports = pagosNode;

@@ -427,6 +427,18 @@ registrationModule.factory('pagoRepository', function($http) {
                     'Content-Type': 'application/json'
                 }
             });
+        },
+        cuentaAutorizadores: function(idEmpresa, cuenta) {
+            return $http({
+                url: pagosNodeUrl + 'cuentaAutorizadores/',
+                method: "GET",
+                params: {
+                    idEmpresa, cuenta
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
         }
 
 
