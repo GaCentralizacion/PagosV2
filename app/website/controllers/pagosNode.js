@@ -190,7 +190,7 @@ pagosNode.prototype.post_liberaDocumentos = function(req, res, next){
     var params = [
             { name: 'idlote', value: req.body.idLote, type: self.model.types.INT },
             { name: 'documento', value: req.body.documento, type: self.model.types.STRING },
-            { name: 'idProveedor', value: req.body.idProveedores, type: self.model.types.INT }            
+            { name: 'idProveedor', value: req.body.idProveedor, type: self.model.types.INT }            
         ];
 
     this.model.query('PROC_LIBERA_DOCUMENTO_V2_SP', params, function(error,  result){
