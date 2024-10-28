@@ -54,7 +54,7 @@ registrationModule.controller("empleadoController", function ($scope, $filter, $
                     return;
                 }
                 else{
-                    $rootScope.currentEmployee = $routeParams.idAprobador;
+                    $rootScope.currentEmployee = getParameterByName('idAprobador');
                 }
                 
             }
