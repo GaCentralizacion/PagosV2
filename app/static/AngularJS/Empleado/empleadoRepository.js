@@ -1,5 +1,5 @@
 var empleadoUrl = global_settings.urlCORS + '/api/empleadoapi/';
-
+var empleadoNodeUrl = global_settings.urlNode + 'empleado/';
 registrationModule.factory('empleadoRepository', function ($http) {
 
     var dominio = document.domain;  
@@ -21,6 +21,18 @@ registrationModule.factory('empleadoRepository', function ($http) {
         update: function (id) {
             return $http.post(empleadoUrl + '2|' + id);
 
+        },
+        getEmpleado: function(id) {
+            return $http({
+                url: empleadoNodeUrl + 'empleado/',
+                method: "GET",
+                params: {
+                    id
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
         }
     };
 });

@@ -61,7 +61,7 @@ registrationModule.controller("empleadoController", function ($scope, $filter, $
         }
         //Obtengo el empleado logueado
         $rootScope.currentEmployee = localStorageService.get('lgnUser');
-        //$rootScope.currentEmployee = 71;
+        // $rootScope.currentEmployee = 72;
 
         
     };

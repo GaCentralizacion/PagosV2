@@ -3,5 +3,6 @@
 	 admonCartera: require('./controllers/admonCartera'),
 	 pagosNode: require('./controllers/pagosNode'),
 	 diaDePago: require('./controllers/diaDePago'),
-	 tipoProveedor: require('./controllers/tipoProveedor')
+	 tipoProveedor: require('./controllers/tipoProveedor'),
+	 empleado: require('./controllers/empleado')
  }
